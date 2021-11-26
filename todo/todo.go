@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const todoRegex string = "^\\s*/{2} (TODO)(O*): (\\w*)$"
+const todoRegex string = "^ *\\/{2} (TODO)(O*): ([a-zA-Z ]*)$"
 
 type Todo struct {
     FileName string
