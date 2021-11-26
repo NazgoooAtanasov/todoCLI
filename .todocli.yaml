@@ -1,0 +1,9 @@
+directory:
+  forbidendirectories:
+    - node_modules
+
+pattern:
+  customregex: ''
+  keyword: ''
+  urgencysuffix: ''
+  commentType: ''
