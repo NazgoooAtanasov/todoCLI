@@ -9,8 +9,8 @@ import (
 	"sort"
 	"strings"
 
-	"todoCLI/todo"
 	"todoCLI/config"
+	"todoCLI/todo"
 )
 
 func main() {
@@ -29,7 +29,16 @@ func main() {
 			panic(err)
 		}
 
-		if !info.IsDir() && !strings.Contains(path, ".git") {
+		var skip bool = false
+
+		for _, element := range config.Directory.ForbidenDirectories {
+			if (strings.Contains(path, element)) {
+				skip = true
+				break
+			}
+		}
+
+		if !info.IsDir() && !skip {
 			file, err := os.Open(path)
 
 			if err != nil {

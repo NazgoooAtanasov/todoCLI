@@ -2,6 +2,7 @@ directory:
   forbidendirectories:
     - node_modules
     - .git
+    - forbiden
 
 pattern:
   keyword: 'custom-keyword-here'
