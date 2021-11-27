@@ -10,10 +10,12 @@ import (
 	"strings"
 
 	"todoCLI/todo"
+	"todoCLI/config"
 )
 
 func main() {
 	cwd, err := os.Getwd()
+	config := config.GetConfig()
 
 	if err != nil {
 		panic(err)
@@ -40,10 +42,10 @@ func main() {
 			for scanner.Scan() {
 				lineNumber++
 				var line string = scanner.Text()
-				var isToDo bool = todo.CheckTodo(line)
+				var isToDo bool = todo.CheckTodo(line, config.ParsingRegex.String())
 
 				if isToDo {
-					todo := todo.ExtactTodo(line, path, lineNumber)
+					todo := todo.ExtactTodo(line, path, lineNumber, config.ParsingRegex)
 					listOfTodos = append(listOfTodos, todo)
 				}
 			}
@@ -65,6 +67,6 @@ func main() {
 	})
 
 	for _, element := range listOfTodos {
-		fmt.Print(element.FormatString())
+		fmt.Print(element.FormatString(config.Pattern.Keyword, config.Pattern.UrgencySuffix))
 	}
 }

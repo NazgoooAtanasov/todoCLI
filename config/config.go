@@ -1,16 +1,20 @@
 package config
 
-import(
+import (
+	"fmt"
 	"io/ioutil"
+	"regexp"
 
 	"gopkg.in/yaml.v3"
 )
 
-type DirectoryConfig struct {
+const configFileName string = ".todocli.yaml"
+
+type directoryConfig struct {
 	ForbidenDirectories []string
 }
 
-type PatternConfig struct {
+type patternConfig struct {
 	CustomRegex string
 	Keyword string
 	UrgencySuffix string
@@ -18,24 +22,57 @@ type PatternConfig struct {
 }
 
 type Config struct {
-	Directory DirectoryConfig
-	Pattern PatternConfig
+	Directory *directoryConfig
+	Pattern *patternConfig
+	ParsingRegex *regexp.Regexp
+}
+
+// default parsing regex "^\\s*// (TODO)(O*): ([a-zA-Z ]*)$"
+func (config *Config) constructParsingRegex() {
+	config.ParsingRegex = regexp.MustCompile(fmt.Sprintf(
+		"^\\s*%s (%s)(%s*): ([a-zA-Z ]*)$",
+		config.Pattern.CommentType,
+		config.Pattern.Keyword,
+		config.Pattern.UrgencySuffix,
+	))
+}
+
+func (config *Config) setDefaults() {
+	directoryConfig := &directoryConfig {
+		ForbidenDirectories: []string{"node_modules", ".git"},
+	}
+
+	patternConfig := &patternConfig{
+		CustomRegex: "",
+		Keyword: "TODO",
+		UrgencySuffix: "O",
+		CommentType: "//",
+	}
+
+	config.Directory = directoryConfig
+	config.Pattern = patternConfig
+
+	config.constructParsingRegex()
 }
 
 func GetConfig() *Config {
-	config, err := ioutil.ReadFile(".todocli.yaml")
+	config, err := ioutil.ReadFile(configFileName)
+	var data Config
+	data.setDefaults()
 
 	if err != nil {
-		panic(err)
+		fmt.Printf("[INFO] Custom config file '%s' does not exist in the current working direcotry, proceeding with the default one.\n", configFileName)
+		return &data
 	}
-
-	var data Config
 
 	err = yaml.Unmarshal(config, &data)
 
 	if err != nil {
-		panic(err)
+		fmt.Printf("[WARN] Error parsing custom config file '%s', proceeding with the default one.\n", configFileName)
+		return &data
 	}
+
+	data.constructParsingRegex()
 
 	return &data
 }

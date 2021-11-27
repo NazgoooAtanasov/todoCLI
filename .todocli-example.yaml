@@ -1,0 +1,10 @@
+directory:
+  forbidendirectories:
+    - node_modules
+    - .git
+
+pattern:
+  keyword: 'custom-keyword-here'
+  urgencysuffix: 'custom-urgency-suffix-here'
+  commenttype: 'language-specific-comment-type'
+  customregex: 'custom-parsing-regex-(WIP)'
